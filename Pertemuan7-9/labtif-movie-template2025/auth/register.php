@@ -1,0 +1,43 @@
+<?php
+    require_once '../database.php';
+
+    class Register{
+        public $db;
+        
+        public function __construct(){
+            $this->db = new Database();
+        }
+
+        public function register(){
+            $username = $_POST['username'];
+            $pass = $_POST['password'];
+            $email = $_POST['email'];
+            if(empty($username) || empty($pass) || empty($email)){
+                echo "<script>alert('Semua Input Harus Diisi');</script>";
+            } else {
+                $get_user = "SELECT * FROM users WHERE email = '$email'";
+                echo $get_user;
+                $result = $this->db->mysqli->query($get_user);
+                $check_email = $result->num_rows;
+
+                if($check_email == 1){
+                echo "<script>alert('Email Sudah Terdaftar');</script>";
+                } else {
+                    $pass = password_hash($pass, PASSWORD_DEFAULT);
+                    $sql = "INSERT INTO users (username, email, password) VALUES ('" . $username . "','" . $email . "','" . $pass . "')";
+
+                    $query = $this->db->mysqli->prepare($sql) or die
+                    ($this->db->mysqli->error);
+                    $query->execute();
+                    if($query){
+                        echo "<script>window.location.href='loginForm.php';</script>";
+                    } else {
+                        echo "<script>alert('Register Gagal!');</script>";
+                    }
+                }
+            }
+        }
+
+        
+    }
+?>
